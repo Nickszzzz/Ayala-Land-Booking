@@ -76,3 +76,50 @@ function my_ajax_callback() {
 
     wp_send_json([]);
 }
+
+
+// Add this code to your theme's functions.php file or create a custom plugin
+
+function get_product_rates_endpoint( $data ) {
+    // Ensure a product_id parameter is present in the request
+    // Get the current post ID
+    $post_id = get_the_ID();
+
+    if ( empty( $data['product_id'] ) ) {
+        return array( 'error' => 'Missing product_id parameter' );
+    }
+
+    // Get the product ID from the request
+    $product_id = absint( $data['product_id'] );
+
+    // Get the rates_daily_rate and rates_hourly_rate field values for the specified product ID
+    $daily_rate = get_field( 'rates_daily_rate', $product_id );
+    $hourly_rate = get_field( 'rates_hourly_rate', $product_id );
+
+    // Return the response
+    return array(
+        'product_id'   => $product_id,
+        'daily_rate'   => $daily_rate,
+        'hourly_rate'  => $hourly_rate,
+    );
+}
+
+function register_custom_rest_routes() {
+    register_rest_route(
+        'custom/v1',
+        '/get_product_rates/',
+        array(
+            'methods'  => 'GET',
+            'callback' => 'get_product_rates_endpoint',
+            'args'     => array(
+                'product_id' => array(
+                    'validate_callback' => function( $param, $request, $key ) {
+                        return is_numeric( $param );
+                    },
+                ),
+            ),
+        )
+    );
+}
+
+add_action( 'rest_api_init', 'register_custom_rest_routes' );

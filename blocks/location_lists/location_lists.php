@@ -5,14 +5,6 @@ $query_args = array(
     'posts_per_page' => -1,
     'order'          => 'DESC',
     'post_status'    => 'publish',
-    'meta_query'     => array(
-        array(
-            'key'     => 'featured_location',
-            'value'   => true, // Set to true to only show posts where 'featured_location' is true
-            'compare' => '=',  // Use '=' for true/false fields
-            'type'    => 'BOOLEAN', // Set the type to BOOLEAN for true/false fields
-        ),
-    ),
 );
 
 $query = new WP_Query($query_args);

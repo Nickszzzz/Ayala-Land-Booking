@@ -11,6 +11,9 @@
  // Add Custom ACF Blocks
 include_once get_stylesheet_directory() . '/blocks/blocks.php';
 
+ // Add Custom Metabox
+ include_once get_stylesheet_directory() . '/metabox/orders.php';
+
 
 // Add Shortcode
 include_once get_stylesheet_directory() . '/posts/custom_posts.php';
@@ -65,21 +68,27 @@ function child_theme_enqueue_scripts_styles() {
     wp_enqueue_style( 'child-theme-custom-woo-style', get_stylesheet_directory_uri() . '/assets/css/custom-woo-style.css', array(), $theme_version , 'all');
     wp_enqueue_style( 'child-theme-custom-forms-style', get_stylesheet_directory_uri() . '/assets/css/custom-forms-style.css', array(), $theme_version , 'all');
 	wp_enqueue_style( 'child-theme-swiper-css',  'https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css', array() , '11.0.4' , 'all');
+	// Register and enqueue Magnific Popup CSS file
+    wp_enqueue_style('magnific-popup', 'https://cdnjs.cloudflare.com/ajax/libs/magnific-popup.js/1.1.0/magnific-popup.css', array(), '1.1.0', 'all');
+	wp_enqueue_style('mobiscroll-style',  get_stylesheet_directory_uri() . '/mobiscroll/css/mobiscroll.jquery.min.css');
 
 
-	wp_enqueue_script('child-theme-javascript', get_stylesheet_directory_uri() . '/assets/js/custom' . '.js', [ 'jquery' ] , $theme_version , true );
     wp_enqueue_script('child-theme-swiper-js',  'https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js', array(), '11.0.4' , true );
 	wp_enqueue_script('ajax-script', get_stylesheet_directory_uri() . '/assets/js/ajax-script.js', array('jquery'), '1.0', true);
-
+	// Register and enqueue Magnific Popup JS file
+	wp_enqueue_script('magnific-popup', 'https://cdnjs.cloudflare.com/ajax/libs/magnific-popup.js/1.1.0/jquery.magnific-popup.min.js', array('jquery'), '1.1.0', true);
 	// Localize the script with the ajaxurl
 	wp_localize_script('ajax-script', 'ajax_object', array('ajaxurl' => admin_url('admin-ajax.php')));
+	wp_localize_script('ajax-script', 'ajax_api_object', array('ajax_api_url' => home_url().'/wp-json'));
 
 
 	// Enqueue Select2
     wp_enqueue_script('select2-js', 'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js', array('jquery'), '4.1.0-rc.0', true);
-
+	wp_enqueue_script('mobiscroll-script', get_stylesheet_directory_uri() . '/mobiscroll/js/mobiscroll.jquery.min.js', array('jquery'), null, true);
     // Enqueue Select2 CSS
     wp_enqueue_style('select2-css', 'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css');
+	wp_enqueue_script('child-theme-javascript', get_stylesheet_directory_uri() . '/assets/js/custom' . '.js', [ 'jquery' ] , $theme_version , true );
+
 }
 
 // CHILD THEME BLOCK VARIATIONS
@@ -393,10 +402,26 @@ function bbloomer_shipping_phone_checkout( $fields ) {
       'class' => array( 'form-row-wide' ),
       'validate' => array( 'phone' ),
       'autocomplete' => 'tel',
-      'priority' => 25,
+      'priority' => 100,
    );
    return $fields;
 }
+
+// Add Booking Notes field on the checkout page
+add_filter('woocommerce_checkout_fields', 'add_booking_notes_field');
+function add_booking_notes_field($fields) {
+    $fields['billing']['booking_notes'] = array(
+        'type'        => 'textarea',
+        'class'       => array('form-row-wide'),
+        'label'       => __('Booking Notes'),
+        'placeholder' => __('Some random notes here......'),
+        'required'    => false,
+        'clear'       => true,
+    );
+
+    return $fields;
+}
+
   
 add_action( 'woocommerce_admin_order_data_after_shipping_address', 'bbloomer_shipping_phone_checkout_display' );
  
@@ -415,3 +440,5 @@ function custom_excerpt_more($more) {
 
 add_filter('excerpt_length', 'custom_excerpt_length');
 add_filter('excerpt_more', 'custom_excerpt_more');
+
+

@@ -84,10 +84,42 @@ jQuery(document).ready(function ($) {
         prevEl: ".swiper-button-prev",
       },
       autoplay: {
-        delay: 3000,
+        delay: 1500,
         disableOnInteraction: false,
       },
       loop: true, // Enable loop mode
     });
+
+    $('.product-single-page__video a').magnificPopup({
+      type:"iframe",
+    })
+
+
+    // Get the current date
+    var today = new Date();
+
+    // Format the current date as YYYY-MM-DD (the format used by the datepicker)
+    var formattedToday = today.toISOString().split('T')[0];
+
+    // Add a class to the datepicker input
+    $('.wp-block-calendar input').addClass('disable-past-dates');
+
+    // Set the min attribute to the current date
+    $('.disable-past-dates').attr('min', formattedToday);
     
+});
+
+mobiscroll.setOptions({
+  theme: 'ios',
+  themeVariant: 'light'
+});
+
+
+jQuery(document).ready(function ($) {
+  $('#demo-calendar').mobiscroll().datepicker({
+    controls: ['calendar', 'time'],
+    select: 'range',
+    display: 'inline',
+    ouchUi: true
+});
 });
